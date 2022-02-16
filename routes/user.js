@@ -22,7 +22,8 @@ router.post('/login',async(req,res)=>{
     }
     if(user &&bcrypt.compareSync(req.body.password,user.passwordHash)){
    const token=jwt.sign({
-userId:user.id
+userId:user.id,
+isAdmin:user.isAdmin
    },secret,{
        expiresIn:'1d'
    })
@@ -69,6 +70,7 @@ router.post('/',async (req,res)=>{
     name:req.body.name,
      email: req.body.email,
      passwordHash:bcrypt.hashSync(req.body.password,10),
+     isAdmin:req.body.isAdmin
    })
    const oldUser = await User.findOne({email:req.body.email });
 
@@ -80,6 +82,17 @@ router.post('/',async (req,res)=>{
    return res.status(404).send('Category cannt be created')
 
    res.send(user);
+   })
+
+   router.get('/get/count', async(req,res)=>{
+      const userCOunt=await User.countDocuments()
+      
+      if(!userCOunt){
+          res.status(500).json({success:false})
+      }
+      res.send({
+          userCount:userCOunt
+      })
    })
 
    module.exports = router;
