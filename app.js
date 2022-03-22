@@ -20,9 +20,11 @@ app.use(errorHandler)
 //routes
 const UserRouter=require('./routes/user')
 const dateRouter=require('./routes/date')
+const searchRouter=require('./routes/search')
 const res = require('express/lib/response')
 app.use(`${api}/users`,UserRouter)
 app.use(`${api}/date`,dateRouter)
+app.use(`${api}/search`,searchRouter)
 
 mongoose.connect(process.env.CONNECT_STR,{
     useNewUrlParser:true,
