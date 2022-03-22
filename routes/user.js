@@ -4,6 +4,8 @@ const jwt=require('jsonwebtoken')
 const User = require('../models/user')
 const bcrypt=require('bcryptjs')
 require('dotenv/config')
+
+
 router.get('/',async (req,res)=>{
     const userList=await User.find()
     if(!userList){
