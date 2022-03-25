@@ -1,22 +1,26 @@
 const mongoose=require('mongoose');
 
 const dateSchema=mongoose.Schema({
-    location:{
-        type:String,
-        required:true,
+    user:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'user',
     },
-    attire:{
-        type:String,
-        required:true,
+    dateDetails:{
+        name:String,
+        location:{
+            type:{type:String,default:'Point'},
+coordinates:{type:[Number]}
+                }        
+        
     },
 })
 
-userSchema.virtual('id').get(function(){
+dateSchema.virtual('id').get(function(){
     return this._id.toHexString();
 })
 
-userSchema.set('toJSON',{
+dateSchema.set('toJSON',{
     virtuals:true,
 })
 
-module.exports=mongoose.model('mydates',userSchema)
+module.exports=mongoose.model('mydates',dateSchema)
