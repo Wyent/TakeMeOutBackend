@@ -24,6 +24,7 @@ router.post('/login',async(req,res)=>{
     }
     if(user &&bcrypt.compareSync(req.body.password,user.passwordHash)){
    const token=jwt.sign({
+
 userId:user.id,
 isAdmin:user.isAdmin
    },secret,{
@@ -72,7 +73,9 @@ router.post('/',async (req,res)=>{
     name:req.body.name,
      email: req.body.email,
      passwordHash:bcrypt.hashSync(req.body.password,10),
-     isAdmin:req.body.isAdmin
+     fname:req.body.fname,
+     lname:req.body.lname
+    //  isAdmin:req.body.isAdmin
    })
    const oldUser = await User.findOne({email:req.body.email });
 
