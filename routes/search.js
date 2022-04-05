@@ -15,6 +15,7 @@ router.post('/', async (req, res, next) => {
         console.log(geoPoint)
         const zipCode = req.body.zipCode;
         const date = req.body.date;
+        const keyword=req.body.keyword;
         var setting = req.body.setting;
         var city = req.body.tyler;
         console.log("true")
@@ -22,7 +23,7 @@ router.post('/', async (req, res, next) => {
         if (setting === "indoor") {
 
             const { data } = await axios.get(
-                ` https://api.seatgeek.com/2/events?&client_id=${Skey}&geoip=true`
+                ` https://api.seatgeek.com/2/events?&q=${keyword}&client_id=${Skey}&geoip=true`
             )
             const object = data.events[0]
             res.json(object)
@@ -30,10 +31,12 @@ router.post('/', async (req, res, next) => {
         } else {
 
             const { data } = await axios.get(
-                `https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=${key}&location=${latitude},${longitude}&radius=5000&keyword=romantic`).catch(console.error())
+          
+                `https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=${key}&location=${latitude},${longitude}&radius=5000&keyword=${keyword}`).catch(console.error())
 
 
-            res.json(data)
+                const object = data.results[0]
+                res.json(object)
         }
     }
  catch (err) {
