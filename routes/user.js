@@ -70,7 +70,7 @@ router.post('/',async (req,res)=>{
    router.post('/register',async (req,res)=>{
    
     let user=new User({
-    name:req.body.name,
+   
      email: req.body.email,
      passwordHash:bcrypt.hashSync(req.body.password,10),
      fname:req.body.fname,
