@@ -13,11 +13,11 @@ router.post('/', async (req, res, next) => {
         const zipCode = req.body.zipCode;
         const date = req.body.date;
         const keyword = req.body.keyword;
-        var setting = req.body.setting;
+        var indoorOutdoor = req.body.indoorOutdoor;
         var city = req.body.tyler;
-        console.log("true")
+       
 
-        if (setting === "indoor") {
+        if (indoorOutdoor) {
 
             const { data } = await axios.get(
                 `https://api.seatgeek.com/2/events?&datetime_utc=${date}&client_id=${Skey}&lat=${latitude}&lon=${longitude}`
