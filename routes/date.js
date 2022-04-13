@@ -4,10 +4,16 @@ const jwt=require('jsonwebtoken')
 const Date = require('../models/date')
 
 require('dotenv/config')
-router.post('/',async (req,res)=>{
+
+router.post('/:id',async (req,res)=>{
+  
   let date=new Date({
-    user:req.body.user,
-    dateDetails:req.body.dateDetails
+    user:req.params.id,
+    name:req.body.name,
+    latitude:req.body.location.lat,
+    longitude:req.body.location.lon,
+    vicinity:req.body.vicinity,
+    photoRef:req.body.photoRef,
   })
 
   date=await date.save()
