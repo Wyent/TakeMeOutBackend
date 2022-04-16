@@ -3,7 +3,7 @@ const express=require('express')
 const app=express()
 require('dotenv/config')
 const morgan=require('morgan')
-
+const port=process.env.PORT||3000
 const cors=require('cors')
 const api=process.env.API_URL
 const authJwt=require('./helpers/jwt')
@@ -47,7 +47,7 @@ app.use(`${api}/search`,searchRouter)
 
 
 
-app.listen(3000,()=>{
+app.listen(port,()=>{
     console.log(api)
     console.log("server is running")
 })
