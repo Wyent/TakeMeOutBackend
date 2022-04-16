@@ -46,11 +46,12 @@ router.get('/:id', async (req, res) => {
 
 
 router.post('/register', async (req, res) => {
-
+const salt=await bcrypt.genSaltSync(10)
+password=await req.body.password
     let user = new User({
 
         email: req.body.email,
-        passwordHash: bcrypt.hashSync(req.body.password, 10),
+        passwordHash:bcrypt.hashSync(password, salt),
         fname: req.body.fname,
         lname: req.body.lname
         

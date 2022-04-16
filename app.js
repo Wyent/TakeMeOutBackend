@@ -23,7 +23,8 @@ app.use(errorHandler)
 mongoose.connect(process.env.CONNECT_STR,{
     useNewUrlParser:true,
     useUnifiedTopology:true,
-    dbName:'userTable'
+    dbName:'userTable',
+    
 })
 .then(()=>{
     console.log('Connection Ready')

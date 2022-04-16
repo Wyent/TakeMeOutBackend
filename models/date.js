@@ -19,4 +19,4 @@ dateSchema.set('toJSON',{
     virtuals:true,
 })
 
-module.exports=mongoose.model('Date',dateSchema)
+module.exports=mongoose.model('mydates',dateSchema)
