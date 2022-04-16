@@ -44,11 +44,10 @@ app.use(`${api}/search`,searchRouter)
 
 
 
-
-
-
-app.listen(port,()=>{
-    console.log(api)
-    console.log("server is running")
+var server=app.listen(process.env.PORT||3000,function(){
+    var port=server.address().port;
+    console.log("Express is working on port"+port)
 })
+
+
 
