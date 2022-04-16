@@ -8,10 +8,9 @@ const dateItems=require('../models/dateitem')
 require('dotenv/config')
 
 
-router.get('/',async(req,res)=>{
+router.post('/getdate',async(req,res)=>{
 
-
-    const orderList = await Date.find();
+const orderList = await Date.find();
     eachdate=[]
     result=[]
     for(let i=0;i<orderList.length;i++){
