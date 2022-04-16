@@ -3,16 +3,12 @@ const mongoose=require('mongoose');
 const dateSchema=mongoose.Schema({
     user:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:'user',
+        ref:'User',
     },
-    dateDetails:{
-        name:String,
-        location:{
-            type:{type:String,default:'Point'},
-coordinates:{type:[Number]}
-                }        
-        
-    },
+    dateItems:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'dateItems'
+    }]
 })
 
 dateSchema.virtual('id').get(function(){
@@ -23,4 +19,4 @@ dateSchema.set('toJSON',{
     virtuals:true,
 })
 
-module.exports=mongoose.model('mydates',dateSchema)
+module.exports=mongoose.model('Date',dateSchema)

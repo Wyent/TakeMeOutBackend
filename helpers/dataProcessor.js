@@ -1,28 +1,25 @@
-// const { json } = require("express/lib/response")
-// const axios = require('axios')
-// const key = process.env.GOOGLE_API_KEY
-// const Skey = process.env.SEATGEEK_API_KEY
+const { json } = require("express/lib/response")
+const axios = require('axios')
 
-// async function processData(longitude, latitude, date, keyword, setting) {
+function processData(data){
+    var output=[]
+   
+   data=data.results
+   console.log(data)
+    data.forEach((element) =>{
+        var object={
+            name:element.name,
+            photoRef:element.photos[0].photo_reference,
+            location:element.geometry.location,
+            rating:element.rating
+            
+            }
+            
+        
+        output.push(object)
+    })
+     return output
 
-//     if (setting === "indoor") {
+}
 
-//         const { data } = await axios.get(
-//             ` https://api.seatgeek.com/2/events?&q=${keyword}&client_id=${Skey}&geoip=true`
-//         )
-//         const object = data.events[0]
-//         return object
-
-//     } else {
-
-//         const { data } = await axios.get(
-
-//             `https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=${key}&location=${latitude},${longitude}&radius=5000&keyword=${keyword}`).catch(console.error())
-
-
-//         const object = data.results[0]
-//         return object
-//         }
-//     }
-
-//     module.exports = { processData }
+module.exports={processData}

@@ -10,11 +10,11 @@ router.post('/', async (req, res, next) => {
     try {
         const latitude = req.body.latitude;
         const longitude = req.body.longitude;
-        const zipCode = req.body.zipCode;
+        
         const date = req.body.date;
         const keyword = req.body.keyword;
         var indoorOutdoor = req.body.indoorOutdoor;
-        var city = req.body.tyler;
+        
        
 
         if (indoorOutdoor) {

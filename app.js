@@ -1,12 +1,15 @@
+const mongoose=require('mongoose')
 const express=require('express')
 const app=express()
 require('dotenv/config')
 const morgan=require('morgan')
-const mongoose=require('mongoose')
+
 const cors=require('cors')
 const api=process.env.API_URL
 const authJwt=require('./helpers/jwt')
 const errorHandler=require('./helpers/errorhandler')
+
+
 
 //Middleware
 
@@ -16,16 +19,7 @@ app.options('*',cors())
 app.use(authJwt())
 
 app.use(errorHandler)
-
-//routes
-const UserRouter=require('./routes/user')
-const dateRouter=require('./routes/date')
-const searchRouter=require('./routes/search')
-const res = require('express/lib/response')
-app.use(`${api}/users`,UserRouter)
-app.use(`${api}/date`,dateRouter)
-app.use(`${api}/search`,searchRouter)
-
+//database
 mongoose.connect(process.env.CONNECT_STR,{
     useNewUrlParser:true,
     useUnifiedTopology:true,
@@ -37,6 +31,17 @@ mongoose.connect(process.env.CONNECT_STR,{
 .catch((err)=>{
     console.log(err);
 })
+
+//routes
+const UserRouter=require('./routes/user')
+const dateRouter=require('./routes/date')
+const searchRouter=require('./routes/search')
+const res = require('express/lib/response')
+app.use(`${api}/users`,UserRouter)
+app.use(`${api}/date`,dateRouter)
+app.use(`${api}/search`,searchRouter)
+
+
 
 
 
