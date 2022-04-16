@@ -4,7 +4,7 @@ const router=express.Router()
 const jwt=require('jsonwebtoken')
 const User = require('../models/user')
 const Date = require('../models/date')
-const dateItems=require('../models/dateItem')
+const dateItems=require('../models/dateitem')
 require('dotenv/config')
 
 
