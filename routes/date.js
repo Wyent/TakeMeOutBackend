@@ -49,6 +49,7 @@ result.push(retrivedate)
 
 
 router.post('/', async (req,res)=>{
+    console.log(req.body)
   var dateItem=await req.body.dateItem
 console.log(dateItem)
 

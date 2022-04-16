@@ -114,7 +114,7 @@ router.put('/:id',async (req, res)=> {
 
     if(!user)
     return res.status(400).send('the user cannot be created!')
-
+console.log(user)
     res.send(user);
 })
 
