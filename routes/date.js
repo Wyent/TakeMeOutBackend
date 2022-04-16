@@ -58,7 +58,7 @@ console.log(dateItem)
           longitude:dateItem.longitude,
           latitude:dateItem.latitude,
           vicinity:dateItem.vicinity,
-          photoref:dateItem.photoref
+          photoref:dateItem.photoRef
       })
 console.log(newdateItem.name)
       newdateItem = await newdateItem.save();
