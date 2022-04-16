@@ -10,6 +10,7 @@ require('dotenv/config')
 
 router.get('/',async(req,res)=>{
 
+
     const orderList = await Date.find();
     eachdate=[]
     result=[]
@@ -25,7 +26,7 @@ result.push(retrivedate)
     }
     
     if(!orderList) {
-        res.status(500).json({success: false})
+        res.status(404).json({success: false})
     } 
     
     
