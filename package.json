@@ -20,7 +20,7 @@
     "latlon-geohash": "^2.0.0",
     "mongoose": "^6.2.1",
     "morgan": "^1.10.0",
-    "ngeohash": "^0.6.3",
-    "nodemon":"-1.0.14"
+    "ngeohash": "^0.6.3"
+   
   }
 }
