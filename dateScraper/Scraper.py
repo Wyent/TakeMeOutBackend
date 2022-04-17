@@ -176,7 +176,7 @@ class Scraper:
         print(json_date_collection)
         print('Number of results: ', result_count)
 
-        # self.upsert_mongo('dates', date_header, dates_dict)
+        self.upsert_mongo('dates', date_header, dates_dict)
         return date_collection
 
         '''client = pymongo.MongoClient(<CONNECTION STRING>)
