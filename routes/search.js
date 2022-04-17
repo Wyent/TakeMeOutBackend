@@ -46,10 +46,12 @@ router.post('/', async (req, res, next) => {
             var details = object.events
             for (let i = 0; i < details.length; i++) {
                 var element = details[i]
+                let locationC = {lat:element.venue.location.lat, lng:element.venue.location.lon}
                 let individual = {
                     name: element.performers[0].name,
                     photoRef: element.performers[0].image,
-                    location: element.venue.location,
+
+                    location: locationC,
                     type: element.type,
                     vicinity: element.venue.address
                 }
