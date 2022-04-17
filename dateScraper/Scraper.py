@@ -155,7 +155,7 @@ class Scraper:
 
                 result_count += 1
 
-                if result_count == 2:
+                if result_count == 5:
                     break
 
             except Exception as e:
