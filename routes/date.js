@@ -49,18 +49,18 @@ result.push(retrivedate)
 
 
 router.post('/', async (req,res)=>{
-    console.log(req.body)
+    
   var dateItem=await req.body.dateItem
 console.log(dateItem)
 
-      let newdateItem = new dateItems({
+      var newdateItem = await new dateItems({
           name:dateItem.name,
           longitude:dateItem.longitude,
           latitude:dateItem.latitude,
           vicinity:dateItem.vicinity,
-          photoref:dateItem.photoRef
+          photoRef:dateItem.photoRef
       })
-console.log(newdateItem.name)
+console.log(newdateItem)
       newdateItem = await newdateItem.save();
 
   const dateItemIdsfinal =  await newdateItem._id;
