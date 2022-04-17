@@ -5,6 +5,7 @@ from selenium import webdriver
 import requests
 import json
 import geocoder
+import os  # getting heroku environment variables
 
 
 class Scraper:
@@ -22,10 +23,23 @@ class Scraper:
         for result in results:
             print(result)
 
-    def create_headless_firefox_browser(self):
-        options = webdriver.FirefoxOptions()
-        options.add_argument('--headless')
-        return webdriver.Firefox(options=options)
+    def create_headless_browser(self):
+        # firefox_options = webdriver.FirefoxOptions()
+        # firefox_options.add_argument('--headless')
+        # driver = webdriver.Firefox(options=firefox_options)
+
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+        chrome_options.add_argument("--no-sandbox")
+        try:
+            driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"),
+                                      chrome_options=chrome_options)
+        except Exception:
+            driver = webdriver.Chrome(options=chrome_options)
+
+        return driver
 
     def get_reverse_geocode(self, latitude, longitude):
         g = geocoder.osm([latitude, longitude], method='reverse')
@@ -35,6 +49,7 @@ class Scraper:
 
     def get_dates_meetup(self, latitude, longitude):
         import time
+
         # todo get lat, long from a port
         # tyler, tx
         # latitude = 32.3512601
@@ -67,7 +82,7 @@ class Scraper:
         url = html_query + location_string + html_query2
 
         # appear as a browser
-        browser = self.create_headless_firefox_browser()
+        browser = self.create_headless_browser()
         browser.get(url)
 
         headers = {
@@ -83,7 +98,7 @@ class Scraper:
             location_string = country + '--' + city
             url = html_query + location_string + html_query2
             # print(url)
-            browser = self.create_headless_firefox_browser()
+            browser = self.create_headless_browser()
             browser.get(url)
             time.sleep(1)
             html = browser.page_source
