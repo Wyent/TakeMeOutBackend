@@ -3,12 +3,11 @@
     "node": "14.x",
     "npm": ">=6.14.5"
   },
-  
   "scripts": {
     "start": "node app.js "
   },
-  
   "dependencies": {
+    "ajax": "^0.0.4",
     "axios": "^0.26.1",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
@@ -20,7 +19,7 @@
     "latlon-geohash": "^2.0.0",
     "mongoose": "^6.2.1",
     "morgan": "^1.10.0",
-    "ngeohash": "^0.6.3"
-   
+    "ngeohash": "^0.6.3",
+    "yelp-fusion": "^3.0.0"
   }
 }

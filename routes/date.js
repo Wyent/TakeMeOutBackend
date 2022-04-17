@@ -78,4 +78,12 @@ console.log(newdateItem)
   res.send(date);
 })
 
+router.delete('/delete'+'/:id', (req, res)=>{
+    console.log("Here")
+    dateItems.findByIdAndRemove(req.params.id).then(
+    res.status(200)).catch(err=>{
+       return res.status(500).json({success: false, error: err}) 
+    })
+})
+
 module.exports=router
