@@ -36,6 +36,7 @@ router.post('/login', async (req, res) => {
 })
 
 router.get('/:id', async (req, res) => {
+    console.log(req.params.id)
     const userList = await User.findById(req.params.id).select('-passwordHash')
     if (!userList) {
         res.status(500).json({ success: false });

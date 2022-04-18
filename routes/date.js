@@ -49,18 +49,18 @@ result.push(retrivedate)
 
 
 router.post('/', async (req,res)=>{
-    console.log(req.body)
+    
   var dateItem=await req.body.dateItem
 console.log(dateItem)
 
-      let newdateItem = new dateItems({
+      var newdateItem = await new dateItems({
           name:dateItem.name,
           longitude:dateItem.longitude,
           latitude:dateItem.latitude,
           vicinity:dateItem.vicinity,
-          photoref:dateItem.photoRef
+          photoRef:dateItem.photoRef
       })
-console.log(newdateItem.name)
+console.log(newdateItem)
       newdateItem = await newdateItem.save();
 
   const dateItemIdsfinal =  await newdateItem._id;
@@ -76,6 +76,14 @@ console.log(newdateItem.name)
   return res.status(400).send('the date cannot be created!')
 
   res.send(date);
+})
+
+router.post('/delete', (req, res)=>{
+    console.log("Here")
+    dateItems.findByIdAndRemove(req.body.dateid).then(
+    res.status(200)).catch(err=>{
+       return res.status(500).json({success: false, error: err}) 
+    })
 })
 
 module.exports=router
