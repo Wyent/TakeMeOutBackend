@@ -34,9 +34,26 @@ router.post('/', async (req, res, next) => {
                
            
         // }
+        if(indoorOutdoor &&(keyword=="trip")){
+            const data=await axios.get(`https://vast-reaches-22877.herokuapp.com/?lat=${latitude}&lon=${longitude}`)
+            details=data.data.dates
+            result=[]
+            for (let i = 0; i < details.length; i++) {
+                var element = details[i]
+                let locationC = {lat:latitude, lng:longitude}
+                let individual = {
+                    name: element.name,
+                    photoRef: element.photoRef,
 
+                    location: locationC,
+                    type: element.type,
+                    vicinity: element.vicinity
+                }
 
-        if (indoorOutdoor) {
+                result.push(individual)
+            }
+            res.json(result)
+        } else if (indoorOutdoor &&(keyword!=="trip")) {
            
             const { data } = await axios.get(
                 `https://api.seatgeek.com/2/events?&datetime_utc=${date}&client_id=${Skey}&lat=${latitude}&lon=${longitude}`
