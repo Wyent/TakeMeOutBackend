@@ -2,9 +2,7 @@
 const axios = require('axios')
 const { response } = require('express')
 const router = require('express').Router()
-const yelp = require('yelp-fusion')
 
-const yelpKey = process.env.Yelp_Fusion_Key
 const key = process.env.GOOGLE_API_KEY
 const Skey = process.env.SEATGEEK_API_KEY
 const moviekey = process.env.X_API_KEY
