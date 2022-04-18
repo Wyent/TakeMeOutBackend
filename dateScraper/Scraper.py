@@ -1,3 +1,4 @@
+import os
 import sys
 from pymongo import MongoClient
 from bs4 import BeautifulSoup
@@ -5,7 +6,6 @@ from selenium import webdriver
 import requests
 import json
 import geocoder
-import os  # getting heroku environment variables
 
 
 class Scraper:
@@ -21,11 +21,11 @@ class Scraper:
 
         # testing
         results = collection.find(search_key)
-        for result in results:
-            print(result)
+        # for result in results:
+        # print(result)
 
     @staticmethod
-    def create_headless_browser():
+    def create_headless_firefox_browser():
         # firefox_options = webdriver.FirefoxOptions()
         # firefox_options.add_argument('--headless')
         # driver = webdriver.Firefox(options=firefox_options)
@@ -44,15 +44,189 @@ class Scraper:
         return driver
 
     @staticmethod
-    def get_reverse_geocode(latitude, longitude):
+    def get_state_abrev(state):
+        us_state_to_abbrev = {
+            "Alabama": "AL",
+            "Alaska": "AK",
+            "Arizona": "AZ",
+            "Arkansas": "AR",
+            "California": "CA",
+            "Colorado": "CO",
+            "Connecticut": "CT",
+            "Delaware": "DE",
+            "Florida": "FL",
+            "Georgia": "GA",
+            "Hawaii": "HI",
+            "Idaho": "ID",
+            "Illinois": "IL",
+            "Indiana": "IN",
+            "Iowa": "IA",
+            "Kansas": "KS",
+            "Kentucky": "KY",
+            "Louisiana": "LA",
+            "Maine": "ME",
+            "Maryland": "MD",
+            "Massachusetts": "MA",
+            "Michigan": "MI",
+            "Minnesota": "MN",
+            "Mississippi": "MS",
+            "Missouri": "MO",
+            "Montana": "MT",
+            "Nebraska": "NE",
+            "Nevada": "NV",
+            "New Hampshire": "NH",
+            "New Jersey": "NJ",
+            "New Mexico": "NM",
+            "New York": "NY",
+            "North Carolina": "NC",
+            "North Dakota": "ND",
+            "Ohio": "OH",
+            "Oklahoma": "OK",
+            "Oregon": "OR",
+            "Pennsylvania": "PA",
+            "Rhode Island": "RI",
+            "South Carolina": "SC",
+            "South Dakota": "SD",
+            "Tennessee": "TN",
+            "Texas": "TX",
+            "Utah": "UT",
+            "Vermont": "VT",
+            "Virginia": "VA",
+            "Washington": "WA",
+            "West Virginia": "WV",
+            "Wisconsin": "WI",
+            "Wyoming": "WY",
+            "District of Columbia": "DC",
+            "American Samoa": "AS",
+            "Guam": "GU",
+            "Northern Mariana Islands": "MP",
+            "Puerto Rico": "PR",
+            "United States Minor Outlying Islands": "UM",
+            "U.S. Virgin Islands": "VI",
+        }
+        return us_state_to_abbrev.get(state)
+
+    @staticmethod
+    def get_indoor_outdoor(date_type):
+        indoor = ['theater', 'winery', 'museum', 'bowling', 'range']
+        outdoor = ['garden', 'park', 'zoo', 'trail', 'aquarium']
+
+        date_type = date_type.lower()
+
+        # any(ele.startswith(type) or ele.endswith(type) for ele in indoor)
+
+        if [ele for ele in indoor if (ele in date_type)]:
+            return 'indoor'
+        elif [ele for ele in outdoor if (ele in date_type)]:
+            return 'outdoor'
+        else:
+            return None
+
+    @staticmethod
+    def get_reverse_geocode(latitude, longitude, state_abrev=False, country_abrev=False):
         g = geocoder.osm([latitude, longitude], method='reverse')
         print(json.dumps(g.json, indent=4))
+        city = g.city
+        state = g.state
+        country = g.country
+        if state_abrev:
+            state = Scraper.get_state_abrev(g.state)
+        if country_abrev:
+            country = g.country_code
 
-        return g.json['city'], g.json['state'], g.json['country_code']
+        return city, state, country
+
+    def get_dates_tripbuzz(self, latitude, longitude):
+        try:
+            city, state, country = self.get_reverse_geocode(latitude, longitude, state_abrev=True)
+        except Exception as e:
+            raise e
+
+        location_string = city + '-' + state
+        location_string.replace(" ", "-")
+        domain = 'https://www.tripbuzz.com'
+        query = '/date-ideas/'
+
+        url = domain + query + location_string
+
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) '
+                          'Version/9.0.2 Safari/601.3.9'}
+
+        r = requests.get(url, headers=headers)
+        soup = BeautifulSoup(r.content, 'lxml')
+
+        # filtering exactly for class city-box to remove sponsored results
+        results = soup.find_all(lambda tag: tag.name == 'div' and tag.get('class') == ['city-box'])
+
+        dates = []  # holds image, url, time, title
+        result_count = 0
+        for item in results:
+            print('-----------Getting Event #', result_count + 1, '--------------')
+            print(item)
+
+            # image url extraction
+            image_block = item.find('a', {'class': 'visual'})
+            image_block = str(image_block)
+
+            img_url = domain + image_block[image_block.find("(") + len("("):image_block.find(")")]
+
+            # url extraction
+            url_block = item.find('h3', {'itemprop': 'name'})
+            date_url = domain + url_block.select('a')[0].get('href')
+
+            # time extraction
+            # need to use another api to get business hours
+            time = None
+
+            # title extraction
+            title = url_block.find('a').get_text()
+
+            # detail extraction
+            details = [item.find('div', {'class': 'city-text'}).get_text()]
+
+            # type extraction
+            date_type = item.find('span', {'class': 'text-blue'}).get_text()
+
+            indoor_outdoor = self.get_indoor_outdoor(date_type)
+
+            # address extraction (vicinity)
+            vicinity = item.find('span', {'class': 'city-address'}).get_text()
+
+            dates.append({
+                'name': title,
+                'photoRef': img_url,
+                'url': date_url,
+                'time': time,
+                'type': date_type,
+                'indoor_outdoor': indoor_outdoor,
+                'vicinity': vicinity,
+                'details': details
+            })
+
+            result_count += 1
+
+        date_header = {
+            'location': {
+                'lat': latitude,
+                'lon': longitude
+            },
+            'country': country,
+            'state': state,
+            'city': city,
+            'source': domain
+        }
+        dates_dict = {
+            'dates': dates
+        }
+        date_collection = date_header | dates_dict
+        # json_date_collection = json.dumps(date_collection)
+
+        self.upsert_mongo('dates', date_header, dates_dict)
+        return date_collection
 
     def get_dates_meetup(self, latitude, longitude):
         import time
-
         # todo get lat, long from a port
         # tyler, tx
         # latitude = 32.3512601
@@ -68,7 +242,7 @@ class Scraper:
 
         # get geocode from lat, long
         try:
-            city, state, country = self.get_reverse_geocode(latitude, longitude)
+            city, state, country = self.get_reverse_geocode(latitude, longitude, country_abrev=True)
         except Exception as e:
             print(e)
             sys.exit()
@@ -80,12 +254,13 @@ class Scraper:
 
         location_string = country + '--' + state + '--' + city
         location_string.replace(" ", "+")
+        domain = 'https://www.meetup.com'
         html_query = 'https://www.meetup.com/find/?location='
         html_query2 = '&source=EVENTS'
         url = html_query + location_string + html_query2
 
         # appear as a browser
-        browser = self.create_headless_browser()
+        browser = self.create_headless_firefox_browser()
         browser.get(url)
 
         headers = {
@@ -101,7 +276,7 @@ class Scraper:
             location_string = country + '--' + city
             url = html_query + location_string + html_query2
             # print(url)
-            browser = self.create_headless_browser()
+            browser = self.create_headless_firefox_browser()
             browser.get(url)
             time.sleep(1)
             html = browser.page_source
@@ -169,13 +344,13 @@ class Scraper:
             'country': country,
             'state': state,
             'city': city,
-            'source': 'meetup.com'
+            'source': domain
         }
         dates_dict = {
             'dates': dates
         }
         date_collection = date_header | dates_dict
-        json_date_collection = json.dumps(date_collection, indent=4)
+        json_date_collection = json.dumps(date_collection)
         print(json_date_collection)
         print('Number of results: ', result_count)
 

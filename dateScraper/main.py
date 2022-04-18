@@ -11,5 +11,6 @@ dates = Scraper()
 @app.get("/")  # get operator decorator
 async def read_item(lat: float, lon: float):
     # return python dictionary, auto converted to json
-    return dates.get_dates_meetup(lat, lon)
+    # return dates.get_dates_meetup(lat, lon)
+    return dates.get_dates_tripbuzz(lat, lon)
 
