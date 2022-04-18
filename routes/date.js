@@ -81,7 +81,7 @@ console.log(newdateItem)
 router.post('/delete', (req, res)=>{
     console.log("Here")
     dateItems.findByIdAndRemove(req.body.dateid).then(
-    res.status(200)).catch(err=>{
+    res.status(200).send("Succesfull deleted")).catch(err=>{
        return res.status(500).json({success: false, error: err}) 
     })
 })
