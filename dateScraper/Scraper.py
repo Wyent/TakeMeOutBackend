@@ -6,6 +6,7 @@ from selenium import webdriver
 import requests
 import json
 import geocoder
+from fastapi import HTTPException
 
 
 class Scraper:
@@ -125,7 +126,7 @@ class Scraper:
     @staticmethod
     def get_reverse_geocode(latitude, longitude, state_abrev=False, country_abrev=False):
         g = geocoder.osm([latitude, longitude], method='reverse')
-        print(json.dumps(g.json, indent=4))
+        # print(json.dumps(g.json, indent=4))
         city = g.city
         state = g.state
         country = g.country
@@ -136,12 +137,45 @@ class Scraper:
 
         return city, state, country
 
-    def get_dates_tripbuzz(self, latitude, longitude):
+    # dates is a list of dictionaries
+    @staticmethod
+    def filter_dates(dates, date_filter):
+        '''dates = [{
+            'name': title,
+            'photoRef': img_url,
+            'url': date_url,
+            'time': time,
+            'type': date_type,
+            'indoor_outdoor': indoor_outdoor,
+            'vicinity': vicinity,
+            'details': details
+        }]'''
+
+        date_filter = date_filter.split(",")
+        filtered_dates = []
+
+        for date in dates:
+            date_name = date['name'].lower()
+            date_type = date['type'].lower()
+            print('Checking "', date_name, '" and "', date_type, '" against', date_filter)
+
+            if [ele for ele in date_filter if (ele in date_name)]:
+                filtered_dates.append(date)
+            elif [ele for ele in date_filter if (ele in date_type)]:
+                filtered_dates.append(date)
+
+        if not filtered_dates:
+            print('no dates found in filter')
+
+        return filtered_dates
+
+    def get_dates_tripbuzz(self, latitude, longitude, date_filter):
         try:
             city, state, country = self.get_reverse_geocode(latitude, longitude, state_abrev=True)
         except Exception as e:
             raise e
 
+        print(city, state, country)
         location_string = city + '-' + state
         location_string.replace(" ", "-")
         domain = 'https://www.tripbuzz.com'
@@ -151,13 +185,18 @@ class Scraper:
         dates = []  # holds image, url, time, title
 
         pages_processed = 1
-        while url is not None and pages_processed < 2:
+        while url is not None and pages_processed < 3:
             print('+++++++++++Getting Page #', pages_processed, '+++++++++++')
             headers = {
                 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) '
                               'Version/9.0.2 Safari/601.3.9'}
 
-            r = requests.get(url, headers=headers)
+            try:
+                r = requests.get(url, headers=headers, timeout=3)
+            except requests.exceptions.ConnectTimeout as e:
+                print(e)
+                raise HTTPException(status_code=504,
+                                    detail='Request timeout')
             soup = BeautifulSoup(r.content, 'lxml')
 
             # filtering exactly for class city-box to remove sponsored results
@@ -208,6 +247,8 @@ class Scraper:
 
                 result_count += 1
 
+                # end processing list of dates
+
             # extracting next page
             # todo if there is no next page break out of parsing loop
             page_block = soup.find('div', {'class': 'paginate'})
@@ -219,6 +260,8 @@ class Scraper:
                 url = next_page
 
             pages_processed += 1
+
+            # end processing pages
 
         date_header = {
             'location': {
@@ -234,9 +277,14 @@ class Scraper:
             'dates': dates
         }
         date_collection = date_header | dates_dict
-        # json_date_collection = json.dumps(date_collection)
 
-        self.upsert_mongo('dates', date_header, dates_dict)
+        # upsert entry to mongodb
+        # self.upsert_mongo('dates', date_header, dates_dict)
+
+        # return filtered data but upload original findings to mongoDB first
+        if date_filter is not None:
+            date_collection['dates'] = self.filter_dates(dates, date_filter)
+
         return date_collection
 
     def get_dates_meetup(self, latitude, longitude):
