@@ -1,11 +1,7 @@
 const mongoose=require('mongoose');
 
 const dateitemSchema=mongoose.Schema({
-    // user:{
-    //     type:mongoose.Schema.Types.ObjectId,
-    //     ref:'user',
-    // },
-    // dateDetails:{
+   
         name:{
             type:String
         },
