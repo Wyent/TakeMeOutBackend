@@ -7,7 +7,9 @@ Since the backend is already deployed to heroku server, the app will run without
 The source code for the frontend can be viewed at: https://github.com/vidsagar/Take-me-out.
 
 Take-me-out
-Backend for Take Me Out
+
+
+-Backend for Take Me Out
 
 In order to run this backend locally on your computer. Please follow the following steps:-
 Install Nodejs if you haven't already: https://nodejs.org/en/
