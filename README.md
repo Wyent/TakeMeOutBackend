@@ -11,7 +11,7 @@ Take-me-out
 
 -Backend for Take Me Out
 
-*In order to run this backend locally on your computer. Please follow the following steps:-
+In order to run this backend locally on your computer. Please follow the following steps:-
 
 *Install Nodejs if you haven't already: https://nodejs.org/en/
 
